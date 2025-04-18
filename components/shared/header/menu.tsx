@@ -6,7 +6,7 @@ const Menu = () => {
     <div className="flex justify-end">
       <nav className="flex gap-3 w-full">
         <Link href="/signin" className="flex items-center header-button">
-          Hellor, Sign in
+          Hello, Sign in
         </Link>
 
         <Link href="/cart" className="header-button">
