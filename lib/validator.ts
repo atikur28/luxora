@@ -38,7 +38,7 @@ export const ProductInputSchema = z.object({
   ratingDistribution: z
     .array(z.object({ rating: z.number(), count: z.number() }))
     .max(5),
-  reviews: z.array(ReviewInputSchema).default([]),
+  reviews: z.array(z.string()).default([]),
   numSales: z.coerce
     .number()
     .int()

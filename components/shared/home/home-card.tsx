@@ -44,7 +44,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
           </CardContent>
           {card.link && (
             <CardFooter>
-              <Link href={card.link.href} className="mt-4 block">
+              <Link href={card.link.href} className="mt-4 block font-medium">
                 {card.link.text}
               </Link>
             </CardFooter>
