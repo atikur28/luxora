@@ -1,18 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { IProduct } from "@/lib/db/models/product.model";
 
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, generateId, round2 } from "@/lib/utils";
 import ImageHover from "./image-hover";
 import ProductPrice from "./product-price";
 import Rating from "./rating";
+import AddToCart from "./add-to-cart";
 
 const ProductCard = ({
   product,
   hideBorder = false,
   hideDetails = false,
+  hideAddToCart = false,
 }: {
   product: IProduct;
   hideDetails?: boolean;
@@ -42,6 +44,7 @@ const ProductCard = ({
       </div>
     </Link>
   );
+
   const ProductDetails = () => (
     <div className="flex-1 space-y-2">
       <p className="font-bold">{product.brand}</p>
@@ -70,6 +73,27 @@ const ProductCard = ({
     </div>
   );
 
+  const AddButton = () => (
+    <div className="w-full text-center">
+      <AddToCart
+        minimal
+        item={{
+          clientId: generateId(),
+          product: product._id,
+          size: product.sizes[0],
+          color: product.colors[0],
+          countInStock: product.countInStock,
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+          price: round2(product.price),
+          quantity: 1,
+          image: product.images[0],
+        }}
+      />
+    </div>
+  );
+
   return hideBorder ? (
     <div className="flex flex-col">
       <ProductImage />
@@ -78,6 +102,7 @@ const ProductCard = ({
           <div className="p-3 flex-1 text-center">
             <ProductDetails />
           </div>
+          {!hideAddToCart && <AddButton />}
         </>
       )}
     </div>
@@ -91,6 +116,9 @@ const ProductCard = ({
           <CardContent className="p-3 flex-1  text-center">
             <ProductDetails />
           </CardContent>
+          <CardFooter className="p-3">
+            {!hideAddToCart && <AddButton />}
+          </CardFooter>
         </>
       )}
     </Card>
