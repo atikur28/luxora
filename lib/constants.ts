@@ -5,6 +5,10 @@ export const APP_DESCRIPTION =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
   "LuxOra is your ultimate shopping destination — a powerful Amazon-inspired platform built with Next.js and MongoDB. Discover top deals, premium products, and seamless experiences all in one place.";
 
+export const APP_COPYRIGHT =
+  process.env.NEXT_PUBLIC_APP_COPYRIGHT ||
+  `Copyright © 2025 ${APP_NAME}. All rights reserved.`;
+
 export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 12);
 
 export const FREE_SHIPPING_MIN_PRICE = Number(
