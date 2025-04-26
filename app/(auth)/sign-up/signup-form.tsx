@@ -138,7 +138,7 @@ export default function SignUpForm() {
             )}
           />
           <div>
-            <Button type="submit">Sign Up</Button>
+            <Button type="submit" className="cursor-pointer">Sign Up</Button>
           </div>
           <div className="text-sm">
             By creating an account, you agree to {APP_NAME}&apos;s{" "}
