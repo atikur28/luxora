@@ -5,6 +5,12 @@ export const APP_DESCRIPTION =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
   "LuxOra is your ultimate shopping destination — a powerful Amazon-inspired platform built with Next.js and MongoDB. Discover top deals, premium products, and seamless experiences all in one place.";
 
+export const SERVER_URL =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || "luxora@resend.dev";
+export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME;
+
 export const APP_COPYRIGHT =
   process.env.NEXT_PUBLIC_APP_COPYRIGHT ||
   `Copyright © 2025 ${APP_NAME}. All rights reserved.`;
