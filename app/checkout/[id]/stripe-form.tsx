@@ -62,7 +62,7 @@ export default function StripeForm({
         {isLoading ? (
           "Purchasing..."
         ) : (
-          <div>
+          <div className="cursor-pointer">
             Purchase - <ProductPrice price={priceInCents / 100} plain />
           </div>
         )}
