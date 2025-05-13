@@ -78,6 +78,11 @@ export default async function UserButton() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuLabel>
+              <Link className={cn(buttonVariants(), "w-full")} href="/affiliate-program">
+                Affiliate marketing
+              </Link>
+            </DropdownMenuLabel>
+            <DropdownMenuLabel>
               <div className="font-normal">
                 New Customer? <Link href="/sign-up">Sign up</Link>
               </div>
