@@ -4,3 +4,4 @@ export const APP_SLOGAN =
 export const APP_DESCRIPTION =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
   "LuxOra is your ultimate shopping destination — a powerful Amazon-inspired platform built with Next.js and MongoDB. Discover top deals, premium products, and seamless experiences all in one place.";
+export const PAGE_SIZE = Number(process.env.PAGE_SIZE || 9);
