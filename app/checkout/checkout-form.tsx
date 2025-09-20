@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import useCartStore from "@/hooks/use-cart-store";
 import useIsMounted from "@/hooks/use-is-mounted";
+import { createOrder } from "@/lib/actions/order.actions";
 import {
   APP_NAME,
   AVAILABLE_DELIVERY_DATES,
@@ -41,6 +42,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import CheckoutFooter from "./checkout-footer";
 
 const shippingAddressDefaultValues =
@@ -83,6 +85,7 @@ const CheckoutForm = () => {
     updateItem,
     removeItem,
     setDeliveryDateIndex,
+    clearCart,
   } = useCartStore();
   const isMounted = useIsMounted();
 
@@ -113,7 +116,26 @@ const CheckoutForm = () => {
     useState<boolean>(false);
 
   const handlePlaceOrder = async () => {
-    // TODO: place order
+    const res = await createOrder({
+      items,
+      shippingAddress,
+      expectedDeliveryDate: calculateFutureDate(
+        AVAILABLE_DELIVERY_DATES[deliveryDateIndex!].daysToDeliver
+      ),
+      deliveryDateIndex,
+      paymentMethod,
+      itemsPrice,
+      shippingPrice,
+      taxPrice,
+      totalPrice,
+    });
+    if (!res.success) {
+      toast.error(res.message);
+    } else {
+      toast.success(res.message);
+      clearCart();
+      router.push(`/checkout/${res.data?.orderId}`);
+    }
   };
   const handleSelectPaymentMethod = () => {
     setIsAddressSelected(true);
