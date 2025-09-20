@@ -1,5 +1,12 @@
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "LuxOra";
 
+export const SERVER_URL =
+  process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000";
+
+export const SENDER_EMAIL = process.env.SENDER_EMAIL || "onboarding@resend.dev";
+
+export const SENDER_NAME = process.env.SENDER_NAME || APP_NAME;
+
 export const APP_SLOGAN =
   process.env.NEXT_PUBLIC_APP_SLOGAN || "Elevate your lifestyle, for less.";
 
@@ -34,6 +41,7 @@ export const AVAILABLE_PAYMENT_METHODS = [
     isDefault: true,
   },
 ];
+
 export const DEFAULT_PAYMENT_METHOD =
   process.env.DEFAULT_PAYMENT_METHOD || "Stripe";
 
