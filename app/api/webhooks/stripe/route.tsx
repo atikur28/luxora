@@ -8,8 +8,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("📌 API HIT হয়েছে");
+
     const { paymentIntentId } = await req.json();
+
+    console.log("➡️ paymentIntentId:", paymentIntentId);
+
     if (!paymentIntentId) {
+      console.error("❌ paymentIntentId missing");
       return new NextResponse("Missing paymentIntentId", { status: 400 });
     }
 
@@ -23,19 +29,32 @@ export async function POST(req: NextRequest) {
       charges: Stripe.ApiList<Stripe.Charge>;
     };
 
-    const orderId = paymentIntent.metadata?.orderId;
-    if (!orderId)
-      return new NextResponse("No orderId in metadata", { status: 400 });
+    console.log("✅ paymentIntent retrieved:", paymentIntent?.id);
 
+    const orderId = paymentIntent.metadata?.orderId;
+
+    console.log("➡️ orderId from metadata:", orderId);
+
+    if (!orderId) {
+      console.error("❌ No orderId in metadata");
+      return new NextResponse("No orderId in metadata", { status: 400 });
+    }
     const order: (IOrder & { user?: { email?: string } }) | null =
       await Order.findById(orderId).populate("user", "email");
-    if (!order) return new NextResponse("Order not found", { status: 400 });
+
+    console.log("➡️ Order found:", order?._id);
+
+    if (!order) {
+      console.error("❌ Order not found in DB");
+      return new NextResponse("Order not found", { status: 400 });
+    }
 
     const email =
       paymentIntent.receipt_email ||
       paymentIntent.charges?.data?.[0]?.billing_details?.email ||
       order.user?.email ||
       "unknown";
+    console.log("➡️ Email to use:", email);
 
     // Mark the order as paid
     order.isPaid = true;
@@ -47,7 +66,10 @@ export async function POST(req: NextRequest) {
       pricePaid: (paymentIntent.amount_received / 100).toFixed(2),
     };
 
+    console.log("➡️ Order before save:", order);
+
     await order.save();
+    console.log("✅ Order saved in DB");
 
     try {
       await sendPurchaseReceipt({ order });
