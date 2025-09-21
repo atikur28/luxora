@@ -2,44 +2,67 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { sendPurchaseReceipt } from "@/emails";
-import Order from "@/lib/db/models/order.model";
+import Order, { IOrder } from "@/lib/db/models/order.model";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(req: NextRequest) {
-  const event = await stripe.webhooks.constructEvent(
-    await req.text(),
-    req.headers.get("stripe-signature") as string,
-    process.env.STRIPE_WEBHOOK_SECRET as string
-  );
+  let event: Stripe.Event;
+
+  try {
+    const body = await req.text();
+    const sig = req.headers.get("stripe-signature") || "";
+    event = stripe.webhooks.constructEvent(
+      body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET || ""
+    );
+  } catch (err) {
+    console.error("❌ Webhook signature verification failed:", err);
+    return new NextResponse(`Webhook Error: ${err}`, { status: 400 });
+  }
 
   if (event.type === "charge.succeeded") {
-    const charge = event.data.object;
-    const orderId = charge.metadata.orderId;
-    const email = charge.billing_details.email;
-    const pricePaidInCents = charge.amount;
-    const order = await Order.findById(orderId).populate("user", "email");
-    if (order == null) {
-      return new NextResponse("Bad Request", { status: 400 });
-    }
+    const charge = event.data.object as Stripe.Charge;
+
+    const orderId = charge.metadata?.orderId;
+    if (!orderId)
+      return new NextResponse("Bad Request: no orderId in metadata", {
+        status: 400,
+      });
+
+    const order = (await Order.findById(orderId).populate(
+      "user",
+      "email"
+    )) as IOrder & { user?: { email?: string } };
+    if (!order)
+      return new NextResponse("Bad Request: order not found", { status: 400 });
+
+    const email =
+      charge.billing_details?.email ?? order.user?.email ?? "unknown";
 
     order.isPaid = true;
     order.paidAt = new Date();
     order.paymentResult = {
-      id: event.id,
+      id: charge.id,
       status: "COMPLETED",
-      email_address: email!,
-      pricePaid: (pricePaidInCents / 100).toFixed(2),
+      email_address: email,
+      pricePaid: (charge.amount / 100).toFixed(2),
     };
+
     await order.save();
+
     try {
       await sendPurchaseReceipt({ order });
-    } catch (err) {
-      console.log("email error", err);
+      console.log("✅ Purchase receipt email sent");
+    } catch (emailErr) {
+      console.error("❌ Email sending error:", emailErr);
     }
+
     return NextResponse.json({
-      message: "updateOrderToPaid was successful",
+      message: "✅ Order updated to Paid successfully",
     });
   }
-  return new NextResponse();
+
+  return NextResponse.json({ received: true });
 }
