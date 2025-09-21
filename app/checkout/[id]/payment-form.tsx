@@ -22,6 +22,10 @@ import { toast } from "sonner";
 import CheckoutFooter from "../checkout-footer";
 import StripeForm from "./stripe-form";
 
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
+);
+
 export default function OrderPaymentForm({
   order,
   paypalClientId,
@@ -159,10 +163,6 @@ export default function OrderPaymentForm({
         </div>
       </CardContent>
     </Card>
-  );
-
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
   );
 
   return (

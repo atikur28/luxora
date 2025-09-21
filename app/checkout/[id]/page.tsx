@@ -8,13 +8,7 @@ export const metadata = {
   title: "Payment",
 };
 
-const CheckoutPaymentPage = async (props: {
-  params: Promise<{
-    id: string;
-  }>;
-}) => {
-  const params = await props.params;
-
+const CheckoutPaymentPage = async ({ params }: { params: { id: string } }) => {
   const { id } = params;
 
   const order = await getOrderById(id);
@@ -22,12 +16,12 @@ const CheckoutPaymentPage = async (props: {
 
   const session = await auth();
 
-  let client_secret = null;
+  let client_secret: string | null = null;
   if (order.paymentMethod === "Stripe" && !order.isPaid) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(order.totalPrice * 100),
-      currency: "USD",
+      currency: "usd",
       metadata: { orderId: order._id },
     });
     client_secret = paymentIntent.client_secret;
