@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
   }
 
-  if (event.type === "payment_intent.succeeded") {
+  if (event.type !== "payment_intent.succeeded") {
     const intent = event.data.object as Stripe.PaymentIntent;
 
     const paymentIntent = (await stripe.paymentIntents.retrieve(intent.id, {
