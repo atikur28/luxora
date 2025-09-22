@@ -65,26 +65,26 @@ const CustomXAxisTick: React.FC<CustomXAxisTickProps> = ({
 
 const STROKE_COLORS: { [key: string]: { [key: string]: string } } = {
   Yellow: {
-    light: "oklch(0.646 0.222 41.116)",
-    dark: "oklch(0.488 0.243 264.376)",
+    light: "#ac9103",
+    dark: "#f1d541",
   },
   Blue: {
-    light: "oklch(0.646 0.222 41.116)",
-    dark: "oklch(0.488 0.243 264.376)",
+    light: "#02366b",
+    dark: "#3399ff",
   },
   Green: {
-    light: "oklch(0.646 0.222 41.116)",
-    dark: "oklch(0.488 0.243 264.376)",
+    light: "#015001",
+    dark: "#06dc06",
   },
   Red: {
-    light: "oklch(0.646 0.222 41.116)",
-    dark: "oklch(0.488 0.243 264.376)",
+    light: "#980404",
+    dark: "#ff3333",
   },
 };
 
 export default function SalesAreaChart({ data }: { data: any[] }) {
   const { theme } = useTheme();
-  const { cssColors, color } = useColorStore(theme);
+  const { color } = useColorStore(theme);
 
   return (
     <ResponsiveContainer width="100%" height={400}>
@@ -98,8 +98,8 @@ export default function SalesAreaChart({ data }: { data: any[] }) {
           dataKey="totalSales"
           stroke={STROKE_COLORS[color.name][theme || "light"]}
           strokeWidth={2}
-          fill={`hsl(${cssColors["--primary"]})`}
-          fillOpacity={0.8}
+          fill={STROKE_COLORS[color.name][theme || "light"]}
+          fillOpacity={0.2}
         />
       </AreaChart>
     </ResponsiveContainer>

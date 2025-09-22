@@ -1,4 +1,5 @@
 "use client";
+
 import { BadgeDollarSign, Barcode, CreditCard, Users } from "lucide-react";
 
 import {
@@ -148,7 +149,7 @@ export default function OverviewReport() {
               <div className="text-2xl font-bold">{data.productsCount}</div>
               <div>
                 <Link className="text-xs" href="/admin/products">
-                  products
+                  Products
                 </Link>
               </div>
             </CardContent>
