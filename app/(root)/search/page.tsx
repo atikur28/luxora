@@ -269,8 +269,8 @@ export default async function SearchPage(props: {
               <ProductCard key={product._id} product={product} />
             ))}
           </div>
-          {data!.totalPages! > 1 && (
-            <Pagination page={page} totalPages={data!.totalPages} />
+          {data.totalPages > 1 && (
+            <Pagination page={page} totalPages={data.totalPages} />
           )}
         </div>
       </div>

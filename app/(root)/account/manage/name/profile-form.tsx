@@ -26,8 +26,7 @@ export const ProfileForm = () => {
   const form = useForm<z.infer<typeof UserNameSchema>>({
     resolver: zodResolver(UserNameSchema),
     defaultValues: {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-      name: session?.user?.name!,
+      name: session?.user?.name ?? "",
     },
   });
 

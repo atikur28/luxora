@@ -5,7 +5,7 @@
   "scripts": {
     "email": "email dev",
     "seed": "npx tsx ./lib/db/seed.ts",
-    "dev": "next dev -p 4003",
+    "dev": "next dev -p 4004",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
@@ -64,7 +64,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@react-email/preview-server": "^4.2.11",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.13",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^19",

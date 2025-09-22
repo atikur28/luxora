@@ -173,16 +173,18 @@ const ProductList = () => {
                 variant="outline"
                 onClick={() => handlePageChange("prev")}
                 disabled={Number(page) <= 1}
-                className="w-24"
+                className="w-24 flex items-center justify-center gap-1"
               >
                 <ChevronLeft /> Previous
               </Button>
-              Page {page} of {data?.totalPages}
+              <span>
+                Page {page} of {data?.totalPages}
+              </span>
               <Button
                 variant="outline"
                 onClick={() => handlePageChange("next")}
                 disabled={Number(page) >= (data?.totalPages ?? 0)}
-                className="w-24"
+                className="w-24 flex items-center justify-center gap-1"
               >
                 Next <ChevronRight />
               </Button>
