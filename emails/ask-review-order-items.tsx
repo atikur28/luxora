@@ -1,13 +1,13 @@
-"use client";
-
 import {
   Body,
+  Button,
   Column,
   Container,
   Head,
   Heading,
   Html,
   Img,
+  Link,
   Preview,
   Row,
   Section,
@@ -23,7 +23,7 @@ type OrderInformationProps = {
   order: IOrder;
 };
 
-PurchaseReceiptEmail.PreviewProps = {
+AskReviewOrderItemsEmail.PreviewProps = {
   order: {
     _id: "123",
     isPaid: true,
@@ -63,20 +63,19 @@ PurchaseReceiptEmail.PreviewProps = {
     isDelivered: true,
   } as IOrder,
 } satisfies OrderInformationProps;
-
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
 
-export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
+export default async function AskReviewOrderItemsEmail({
+  order,
+}: OrderInformationProps) {
   return (
     <Html>
-      <Preview>View order receipt</Preview>
+      <Preview>Review Order Items</Preview>
       <Tailwind>
         <Head />
         <Body className="font-sans bg-white">
           <Container className="max-w-xl">
-            <Heading>Purchase Receipt</Heading>
-
-            {/* Order Info */}
+            <Heading>Review Order Items</Heading>
             <Section>
               <Row>
                 <Column>
@@ -103,17 +102,11 @@ export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
                 </Column>
               </Row>
             </Section>
-
-            {/* Order Items */}
             <Section className="border border-solid border-gray-500 rounded-lg p-4 md:p-6 my-4">
               {order.items.map((item) => (
                 <Row key={item.product} className="mt-8">
                   <Column className="w-20">
-                    <a
-                      href={`${SERVER_URL}/product/${item.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <Link href={`${SERVER_URL}/product/${item.slug}`}>
                       <Img
                         width="80"
                         alt={item.name}
@@ -124,26 +117,25 @@ export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
                             : item.image
                         }
                       />
-                    </a>
+                    </Link>
                   </Column>
                   <Column className="align-top">
-                    <a
-                      href={`${SERVER_URL}/product/${item.slug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <Link href={`${SERVER_URL}/product/${item.slug}`}>
                       <Text className="mx-2 my-0">
                         {item.name} x {item.quantity}
                       </Text>
-                    </a>
+                    </Link>
                   </Column>
-                  <Column align="right" className="align-top">
-                    <Text className="m-0">{formatCurrency(item.price)}</Text>
+                  <Column align="right" className="align-top ">
+                    <Button
+                      href={`${SERVER_URL}/product/${item.slug}#reviews`}
+                      className="text-center bg-blue-500 hover:bg-blue-700 text-white   py-2 px-4 rounded"
+                    >
+                      Review this product
+                    </Button>
                   </Column>
                 </Row>
               ))}
-
-              {/* Price Summary */}
               {[
                 { name: "Items", price: order.itemsPrice },
                 { name: "Tax", price: order.taxPrice },

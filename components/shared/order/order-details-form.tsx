@@ -14,12 +14,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { deliverOrder, updateOrderToPaid } from "@/lib/actions/order.actions";
 import { IOrder } from "@/lib/db/models/order.model";
 import { cn, formatDateTime } from "@/lib/utils";
+import ActionButton from "../action-button";
 import ProductPrice from "../product/product-price";
 
 export default function OrderDetailsForm({
   order,
+  isAdmin,
 }: {
   order: IOrder;
   isAdmin: boolean;
@@ -122,37 +125,34 @@ export default function OrderDetailsForm({
       </div>
       <div>
         <Card>
-          <CardContent className="p-4  space-y-4 gap-4">
+          <CardContent className="p-4 space-y-4 gap-4">
             <h2 className="text-xl pb-4">Order Summary</h2>
             <div className="flex justify-between">
               <div>Items</div>
               <div>
-                {" "}
                 <ProductPrice price={itemsPrice} plain />
               </div>
             </div>
             <div className="flex justify-between">
               <div>Tax</div>
               <div>
-                {" "}
                 <ProductPrice price={taxPrice} plain />
               </div>
             </div>
             <div className="flex justify-between">
               <div>Shipping</div>
               <div>
-                {" "}
                 <ProductPrice price={shippingPrice} plain />
               </div>
             </div>
             <div className="flex justify-between">
               <div>Total</div>
               <div>
-                {" "}
                 <ProductPrice price={totalPrice} plain />
               </div>
             </div>
 
+            {/* Pay Order button */}
             {!isPaid && ["Stripe", "PayPal"].includes(paymentMethod) && (
               <Link
                 className={cn(buttonVariants(), "w-full")}
@@ -160,6 +160,20 @@ export default function OrderDetailsForm({
               >
                 Pay Order
               </Link>
+            )}
+
+            {/* Admin actions */}
+            {isAdmin && !isPaid && paymentMethod === "Cash On Delivery" && (
+              <ActionButton
+                caption="Mark as paid"
+                action={() => updateOrderToPaid(order._id)}
+              />
+            )}
+            {isAdmin && isPaid && !isDelivered && (
+              <ActionButton
+                caption="Mark as delivered"
+                action={() => deliverOrder(order._id)}
+              />
             )}
           </CardContent>
         </Card>
