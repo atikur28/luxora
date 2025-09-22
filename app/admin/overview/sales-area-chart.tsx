@@ -64,9 +64,22 @@ const CustomXAxisTick: React.FC<CustomXAxisTickProps> = ({
 };
 
 const STROKE_COLORS: { [key: string]: { [key: string]: string } } = {
-  Red: { light: "#980404", dark: "#ff3333" },
-  Green: { light: "#015001", dark: "#06dc06" },
-  Gold: { light: "#ac9103", dark: "#f1d541" },
+  Yellow: {
+    light: "oklch(0.646 0.222 41.116)",
+    dark: "oklch(0.488 0.243 264.376)",
+  },
+  Blue: {
+    light: "oklch(0.646 0.222 41.116)",
+    dark: "oklch(0.488 0.243 264.376)",
+  },
+  Green: {
+    light: "oklch(0.646 0.222 41.116)",
+    dark: "oklch(0.488 0.243 264.376)",
+  },
+  Red: {
+    light: "oklch(0.646 0.222 41.116)",
+    dark: "oklch(0.488 0.243 264.376)",
+  },
 };
 
 export default function SalesAreaChart({ data }: { data: any[] }) {
