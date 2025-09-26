@@ -25,7 +25,7 @@ const UpdateWebPage = async (props: UpdateWebPageProps) => {
         <Link href={`/admin/web-pages/${webPage._id}`}>{webPage._id}</Link>
       </div>
 
-      <div className="my-8">
+      <div className="my-8 ">
         <WebPageForm type="Update" webPage={webPage} webPageId={webPage._id} />
       </div>
     </main>
