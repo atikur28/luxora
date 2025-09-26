@@ -2,9 +2,11 @@
 import { auth, signIn, signOut } from "@/auth";
 import { IUserName, IUserSignIn, IUserSignUp } from "@/types";
 import bcrypt from "bcryptjs";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { PAGE_SIZE } from "../constants";
 import { connectToDatabase } from "../db";
-import User from "../db/models/user.model";
+import User, { IUser } from "../db/models/user.model";
 import { formatError } from "../utils";
 import { UserSignUpSchema } from "../validator";
 
@@ -59,4 +61,44 @@ export async function updateUserName(user: IUserName) {
   } catch (error) {
     return { success: false, message: formatError(error) };
   }
+}
+
+// DELETE
+
+export async function deleteUser(id: string) {
+  try {
+    await connectToDatabase();
+    const res = await User.findByIdAndDelete(id);
+    if (!res) throw new Error("Use not found");
+    revalidatePath("/admin/users");
+    return {
+      success: true,
+      message: "User deleted successfully",
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
+}
+
+// GET
+export async function getAllUsers({
+  limit,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  limit = limit || PAGE_SIZE;
+  await connectToDatabase();
+
+  const skipAmount = (Number(page) - 1) * limit;
+  const users = await User.find()
+    .sort({ createdAt: "desc" })
+    .skip(skipAmount)
+    .limit(limit);
+  const usersCount = await User.countDocuments();
+  return {
+    data: JSON.parse(JSON.stringify(users)) as IUser[],
+    totalPages: Math.ceil(usersCount / limit),
+  };
 }
