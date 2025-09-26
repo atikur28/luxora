@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -6,85 +7,74 @@ import Order, { IOrder } from "@/lib/db/models/order.model";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
+
 export async function POST(req: NextRequest) {
   try {
-    console.log("📌 API HIT হয়েছে");
+    console.log("📌 Webhook API HIT হয়েছে");
 
-    const { paymentIntentId } = await req.json();
+    const rawBody = await req.text();
 
-    console.log("➡️ paymentIntentId:", paymentIntentId);
+    const sig = req.headers.get("stripe-signature");
 
-    if (!paymentIntentId) {
-      console.error("❌ paymentIntentId missing");
-      return new NextResponse("Missing paymentIntentId", { status: 400 });
+    if (!sig) {
+      return new NextResponse("❌ Missing Stripe signature", { status: 400 });
     }
 
-    // Retrieve paymentIntent directly from Stripe (no webhook verification needed)
-    const paymentIntent = (await stripe.paymentIntents.retrieve(
-      paymentIntentId,
-      {
-        expand: ["charges.data.billing_details"],
-      }
-    )) as unknown as Stripe.PaymentIntent & {
-      charges: Stripe.ApiList<Stripe.Charge>;
-    };
-
-    console.log("✅ paymentIntent retrieved:", paymentIntent?.id);
-
-    const orderId = paymentIntent.metadata?.orderId;
-
-    console.log("➡️ orderId from metadata:", orderId);
-
-    if (!orderId) {
-      console.error("❌ No orderId in metadata");
-      return new NextResponse("No orderId in metadata", { status: 400 });
-    }
-    const order: (IOrder & { user?: { email?: string } }) | null =
-      await Order.findById(orderId).populate("user", "email");
-
-    console.log("➡️ Order found:", order?._id);
-
-    if (!order) {
-      console.error("❌ Order not found in DB");
-      return new NextResponse("Order not found", { status: 400 });
-    }
-
-    const email =
-      paymentIntent.receipt_email ||
-      paymentIntent.charges?.data?.[0]?.billing_details?.email ||
-      order.user?.email ||
-      "unknown";
-    console.log("➡️ Email to use:", email);
-
-    // Mark the order as paid
-    order.isPaid = true;
-    order.paidAt = new Date();
-    order.paymentResult = {
-      id: paymentIntent.id,
-      status: "COMPLETED",
-      email_address: email,
-      pricePaid: (paymentIntent.amount_received / 100).toFixed(2),
-    };
-
-    console.log("➡️ Order before save:", order);
-
-    await order.save();
-    console.log("✅ Order saved in DB");
+    let event: Stripe.Event;
 
     try {
-      await sendPurchaseReceipt({ order });
-      console.log("✅ Purchase receipt email sent");
-    } catch (emailErr: unknown) {
-      const err = emailErr as Error;
-      console.error("❌ Email sending error:", err.message);
+      event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
+    } catch (err: any) {
+      console.error("❌ Webhook signature verification failed:", err.message);
+      return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
     }
 
-    return NextResponse.json({
-      message: "✅ Order updated to Paid successfully (no webhook)",
-    });
-  } catch (err: unknown) {
-    const error = err as Error;
-    console.error("❌ Payment processing failed:", error.message);
-    return new NextResponse(`Error: ${error.message}`, { status: 500 });
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+
+      const orderId = session.metadata?.orderId;
+      if (!orderId) {
+        console.error("❌ No orderId in metadata");
+        return new NextResponse("No orderId in metadata", { status: 400 });
+      }
+
+      const order: (IOrder & { user?: { email?: string } }) | null =
+        await Order.findById(orderId).populate("user", "email");
+
+      if (!order) {
+        console.error("❌ Order not found in DB");
+        return new NextResponse("Order not found", { status: 400 });
+      }
+
+      const email =
+        session.customer_details?.email || order.user?.email || "unknown";
+
+      order.isPaid = true;
+      order.paidAt = new Date();
+      order.paymentResult = {
+        id: session.payment_intent as string,
+        status: "COMPLETED",
+        email_address: email,
+        pricePaid: ((session.amount_total ?? 0) / 100).toFixed(2),
+      };
+
+      await order.save();
+      console.log("✅ Order saved in DB");
+
+      try {
+        await sendPurchaseReceipt({ order });
+        console.log("✅ Purchase receipt email sent");
+      } catch (emailErr: any) {
+        console.error("❌ Email sending error:", emailErr.message);
+      }
+    } else {
+      console.log("ℹ️ Ignored event type:", event.type);
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (err: any) {
+    console.error("❌ Webhook error:", err.message);
+    return new NextResponse(`Webhook error: ${err.message}`, { status: 500 });
   }
 }
