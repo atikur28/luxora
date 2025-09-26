@@ -23,12 +23,9 @@ import { createWebPage, updateWebPage } from "@/lib/actions/web-page.actions";
 import { IWebPage } from "@/lib/db/models/web-page.model";
 import { toSlug } from "@/lib/utils";
 import { WebPageInputSchema, WebPageUpdateSchema } from "@/lib/validator";
-import "react-markdown-editor-lite/lib/index.css";
 import { z } from "zod";
 
-const MdEditor = dynamic(() => import("react-markdown-editor-lite"), {
-  ssr: false,
-});
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 const webPageDefaultValues =
   process.env.NODE_ENV === "development"
@@ -134,12 +131,14 @@ export const WebPageForm = ({
               <FormItem className="w-full">
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  <MdEditor
-                    {...field}
-                    style={{ height: "500px" }}
-                    renderHTML={(text) => <ReactMarkdown>{text}</ReactMarkdown>}
-                    onChange={({ text }) => form.setValue("content", text)}
+                  <MDEditor
+                    value={field.value}
+                    height={500}
+                    onChange={(value) => form.setValue("content", value || "")}
                   />
+                  <div className="mt-4">
+                    <ReactMarkdown>{field.value}</ReactMarkdown>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
