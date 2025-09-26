@@ -196,3 +196,10 @@ export const UserSignUpSchema = UserSignInSchema.extend({
 export const UserNameSchema = z.object({
   name: UserName,
 });
+
+export const UserUpdateSchema = z.object({
+  _id: MongoId,
+  name: UserName,
+  email: Email,
+  role: UserRole,
+});

@@ -5,7 +5,7 @@
   "scripts": {
     "email": "email dev",
     "seed": "npx tsx ./lib/db/seed.ts",
-    "dev": "next dev -p 4004",
+    "dev": "next dev -p 4005",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
