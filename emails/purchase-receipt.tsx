@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Body,
   Column,
@@ -15,7 +13,7 @@ import {
   Text,
 } from "@react-email/components";
 
-import { SERVER_URL } from "@/lib/constants";
+import { getSetting } from "@/lib/actions/setting.actions";
 import { IOrder } from "@/lib/db/models/order.model";
 import { formatCurrency } from "@/lib/utils";
 
@@ -66,7 +64,11 @@ PurchaseReceiptEmail.PreviewProps = {
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
 
-export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
+export default async function PurchaseReceiptEmail({
+  order,
+}: OrderInformationProps) {
+  const { site } = await getSetting();
+
   return (
     <Html>
       <Preview>View order receipt</Preview>
@@ -110,7 +112,7 @@ export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
                 <Row key={item.product} className="mt-8">
                   <Column className="w-20">
                     <a
-                      href={`${SERVER_URL}/product/${item.slug}`}
+                      href={`${site.url}/product/${item.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -120,7 +122,7 @@ export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
                         className="rounded"
                         src={
                           item.image.startsWith("/")
-                            ? `${SERVER_URL}${item.image}`
+                            ? `${site.url}${item.image}`
                             : item.image
                         }
                       />
@@ -128,7 +130,7 @@ export default function PurchaseReceiptEmail({ order }: OrderInformationProps) {
                   </Column>
                   <Column className="align-top">
                     <a
-                      href={`${SERVER_URL}/product/${item.slug}`}
+                      href={`${site.url}/product/${item.slug}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

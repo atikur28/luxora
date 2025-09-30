@@ -5,11 +5,11 @@ import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { PAGE_SIZE } from "../constants";
 import { connectToDatabase } from "../db";
 import User, { IUser } from "../db/models/user.model";
 import { formatError } from "../utils";
 import { UserSignUpSchema, UserUpdateSchema } from "../validator";
+import { getSetting } from "./setting.actions";
 
 export async function signInWithCredentials(user: IUserSignIn) {
   return await signIn("credentials", { ...user, redirect: false });
@@ -89,8 +89,13 @@ export async function getAllUsers({
   limit?: number;
   page: number;
 }) {
-  limit = limit || PAGE_SIZE;
   await connectToDatabase();
+
+  // get pageSize from settings
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
 
   const skipAmount = (Number(page) - 1) * limit;
   const users = await User.find()

@@ -19,7 +19,6 @@ export const sendAskReviewOrderItems = async ({ order }: { order: IOrder }) => {
   const oneDayFromNow = new Date(
     Date.now() + 1000 * 60 * 60 * 24
   ).toISOString();
-  console.log("order", order);
   await resend.emails.send({
     from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
     to: (order.user as { email: string }).email,

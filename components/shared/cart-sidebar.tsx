@@ -1,7 +1,9 @@
 import useCartStore from "@/hooks/use-cart-store";
-import { FREE_SHIPPING_MIN_PRICE } from "@/lib/constants";
+import useSettingStore from "@/hooks/use-setting-store";
+import { getDirection } from "@/i18n-config";
 import { cn } from "@/lib/utils";
 import { TrashIcon } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, buttonVariants } from "../ui/button";
@@ -23,18 +25,31 @@ export default function CartSidebar() {
     removeItem,
   } = useCartStore();
 
+  const {
+    setting: {
+      common: { freeShippingMinPrice },
+    },
+  } = useSettingStore();
+
+  const t = useTranslations();
+  const locale = useLocale();
+
   return (
-    <div className="w-36 overflow-y-auto">
-      <div className={`fixed border-l h-full`}>
-        <div className="p-2 h-full flex flex-col gap-2 justify-start items-center">
+    <div className="w-32 overflow-y-auto">
+      <div
+        className={`w-32 fixed h-full ${
+          getDirection(locale) === "rtl" ? "border-r" : "border-l"
+        }`}
+      >
+        <div className="p-2 h-full flex flex-col gap-2 justify-center items-center">
           <div className="text-center space-y-2">
-            <div> Subtotal</div>
+            <div>{t("Cart.Subtotal")}</div>
             <div className="font-bold">
               <ProductPrice price={itemsPrice} plain />
             </div>
-            {itemsPrice > FREE_SHIPPING_MIN_PRICE && (
-              <div className=" text-center text-xs">
-                Your order qualifies for FREE Shipping
+            {itemsPrice > freeShippingMinPrice && (
+              <div className="text-center text-xs">
+                {t("Cart.Your order qualifies for FREE Shipping")}
               </div>
             )}
 
@@ -45,12 +60,12 @@ export default function CartSidebar() {
               )}
               href="/cart"
             >
-              Go to Cart
+              {t("Cart.Go to Cart")}
             </Link>
             <Separator className="mt-3" />
           </div>
 
-          <ScrollArea className="flex-1  w-full">
+          <ScrollArea className="flex-1 w-full">
             {items.map((item) => (
               <div key={item.clientId}>
                 <div className="my-3">

@@ -15,7 +15,7 @@ import {
   Text,
 } from "@react-email/components";
 
-import { SERVER_URL } from "@/lib/constants";
+import { getSetting } from "@/lib/actions/setting.actions";
 import { IOrder } from "@/lib/db/models/order.model";
 import { formatCurrency } from "@/lib/utils";
 
@@ -63,11 +63,14 @@ AskReviewOrderItemsEmail.PreviewProps = {
     isDelivered: true,
   } as IOrder,
 } satisfies OrderInformationProps;
+
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium" });
 
 export default async function AskReviewOrderItemsEmail({
   order,
 }: OrderInformationProps) {
+  const { site } = await getSetting();
+
   return (
     <Html>
       <Preview>Review Order Items</Preview>
@@ -106,21 +109,21 @@ export default async function AskReviewOrderItemsEmail({
               {order.items.map((item) => (
                 <Row key={item.product} className="mt-8">
                   <Column className="w-20">
-                    <Link href={`${SERVER_URL}/product/${item.slug}`}>
+                    <Link href={`${site.url}/product/${item.slug}`}>
                       <Img
                         width="80"
                         alt={item.name}
                         className="rounded"
                         src={
                           item.image.startsWith("/")
-                            ? `${SERVER_URL}${item.image}`
+                            ? `${site.url}${item.image}`
                             : item.image
                         }
                       />
                     </Link>
                   </Column>
                   <Column className="align-top">
-                    <Link href={`${SERVER_URL}/product/${item.slug}`}>
+                    <Link href={`${site.url}/product/${item.slug}`}>
                       <Text className="mx-2 my-0">
                         {item.name} x {item.quantity}
                       </Text>
@@ -128,8 +131,8 @@ export default async function AskReviewOrderItemsEmail({
                   </Column>
                   <Column align="right" className="align-top ">
                     <Button
-                      href={`${SERVER_URL}/product/${item.slug}#reviews`}
-                      className="text-center bg-blue-500 hover:bg-blue-700 text-white   py-2 px-4 rounded"
+                      href={`${site.url}/product/${item.slug}#reviews`}
+                      className="text-center bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
                     >
                       Review this product
                     </Button>

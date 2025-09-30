@@ -2,6 +2,7 @@
 
 import { formUrlQuery } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "../ui/button";
 
@@ -14,6 +15,7 @@ type PaginationProps = {
 const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations();
 
   const onClick = (btnType: string) => {
     const pageValue = btnType === "next" ? Number(page) + 1 : Number(page) - 1;
@@ -34,10 +36,10 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
         onClick={() => onClick("prev")}
         disabled={Number(page) <= 1}
       >
-        <ChevronLeft /> Previous
+        <ChevronLeft /> {t("Search.Previous")}
       </Button>
       <span>
-        Page {page} of {totalPages}
+        {t("Search.Page")} {page} {t("Search.of")} {totalPages}
       </span>
       <Button
         size="lg"
@@ -46,7 +48,7 @@ const Pagination = ({ page, totalPages, urlParamName }: PaginationProps) => {
         onClick={() => onClick("next")}
         disabled={Number(page) >= totalPages}
       >
-        Next <ChevronRight />
+        {t("Search.Next")} <ChevronRight />
       </Button>
     </div>
   );

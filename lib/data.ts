@@ -1,3 +1,4 @@
+import { i18n } from "@/i18n-config";
 import { Data, IProductInput, IUserInput } from "@/types";
 import bcrypt from "bcryptjs";
 import { toSlug } from "./utils";
@@ -1240,6 +1241,105 @@ We also provide helpful resources such as order tracking, product guides, and FA
       slug: "shipping",
       content: "Shipping Rates & Policies",
       isPublished: true,
+    },
+  ],
+  settings: [
+    {
+      common: {
+        freeShippingMinPrice: 35,
+        isMaintenanceMode: false,
+        defaultTheme: "Light",
+        defaultColor: "Yellow",
+        pageSize: 9,
+      },
+      site: {
+        name: "LuxOra",
+        description:
+          "LuxOra is your ultimate shopping destination — a powerful Amazon-inspired platform built with Next.js and MongoDB. Discover top deals, premium products, and seamless experiences all in one place.",
+        keywords:
+          "LuxOra, Online Shopping, Next.js Ecommerce, Tailwind CSS, MongoDB, Premium Deals, Electronics, Fashion, Home Essentials, Fast Delivery",
+        url: "https://next-mongo-ecommerce-final.vercel.app",
+        logo: "/icons/logo.svg",
+        slogan: "Shop Smart. Live Luxuriously.",
+        author: "LuxOra Team",
+        copyright: "© 2020-2025 LuxOra, Inc. All rights reserved.",
+        email: "support@luxora.com",
+        address: "456 Luxury Avenue, Suite 101, Silicon Valley, CA, 94043, USA",
+        phone: "+880 1854812755",
+      },
+      carousels: [
+        {
+          title: "Most Popular Shoes For Sale",
+          buttonCaption: "Shop Now",
+          image: "/images/banner3.jpg",
+          url: "/search?category=Shoes",
+        },
+        {
+          title: "Best Sellers in T-Shirts",
+          buttonCaption: "Shop Now",
+          image: "/images/banner1.jpg",
+          url: "/search?category=T-Shirts",
+        },
+        {
+          title: "Best Deals on Wrist Watches",
+          buttonCaption: "See More",
+          image: "/images/banner2.jpg",
+          url: "/search?category=Wrist Watches",
+        },
+      ],
+      availableLanguages: i18n.locales.map((locale) => ({
+        code: locale.code,
+        name: locale.name,
+      })),
+      defaultLanguage: "en-US",
+      availableCurrencies: [
+        {
+          name: "United States Dollar",
+          code: "USD",
+          symbol: "$",
+          convertRate: 1,
+        },
+        {
+          name: "Euro",
+          code: "EUR",
+          symbol: "€",
+          convertRate: 0.96,
+        },
+        {
+          name: "Bangladeshi Taka",
+          code: "BDT",
+          symbol: "৳",
+          convertRate: 110,
+        },
+      ],
+      defaultCurrency: "USD",
+      availablePaymentMethods: [
+        { name: "PayPal", commission: 0 },
+        { name: "Stripe", commission: 0 },
+        { name: "Cash On Delivery", commission: 0 },
+      ],
+      defaultPaymentMethod: "PayPal",
+      availableDeliveryDates: [
+        {
+          name: "Tomorrow",
+          daysToDeliver: 1,
+          shippingPrice: 12.9,
+          freeShippingMinPrice: 0,
+        },
+        {
+          name: "Next 3 Days",
+          daysToDeliver: 3,
+          shippingPrice: 6.9,
+          freeShippingMinPrice: 0,
+        },
+        {
+          name: "Next 5 Days",
+          daysToDeliver: 5,
+          shippingPrice: 4.9,
+          freeShippingMinPrice: 35,
+        },
+      ],
+      defaultDeliveryDate: "Next 5 Days",
     },
   ],
 };

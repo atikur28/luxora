@@ -5,7 +5,7 @@
   "scripts": {
     "email": "email dev",
     "seed": "npx tsx ./lib/db/seed.ts",
-    "dev": "next dev -p 4005",
+    "dev": "next dev -p 4007",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
@@ -43,6 +43,7 @@
     "mongoose": "^8.18.1",
     "next": "15.5.3",
     "next-auth": "^5.0.0-beta.29",
+    "next-intl": "^4.3.9",
     "next-themes": "^0.4.6",
     "query-string": "^9.3.1",
     "react": "19.1.0",

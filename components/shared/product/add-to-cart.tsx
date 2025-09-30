@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import useCartStore from "@/hooks/use-cart-store";
 import { OrderItem } from "@/types";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,8 +25,8 @@ export default function AddToCart({
 }) {
   const router = useRouter();
   const { addItem } = useCartStore();
-
   const [quantity, setQuantity] = useState(1);
+  const t = useTranslations();
 
   return minimal ? (
     <Button
@@ -33,18 +34,18 @@ export default function AddToCart({
       onClick={() => {
         try {
           addItem(item, 1);
-          toast.success("Added to Cart", {
+          toast.success(t("Product.Added to Cart"), {
             action: {
-              label: "Go to Cart",
+              label: t("Product.Go to Cart"),
               onClick: () => router.push("/cart"),
             },
           });
         } catch (error: any) {
-          toast.error(error.message || "Something went wrong");
+          toast.error(error.message || t("Product.Something went wrong"));
         }
       }}
     >
-      Add to Cart
+      {t("Product.Add to Cart")}
     </Button>
   ) : (
     <div className="w-full space-y-2">
@@ -53,8 +54,9 @@ export default function AddToCart({
         onValueChange={(i) => setQuantity(Number(i))}
       >
         <SelectTrigger className="w-full cursor-pointer">
-          {" "}
-          <SelectValue>Quantity: {quantity}</SelectValue>
+          <SelectValue>
+            {t("Product.Quantity")}: {quantity}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent position="popper">
           {Array.from({ length: item.countInStock }).map((_, i) => (
@@ -71,14 +73,14 @@ export default function AddToCart({
         onClick={async () => {
           try {
             const itemId = await addItem(item, quantity);
-            toast.success("Item added to cart");
+            toast.success(t("Product.Added to Cart"));
             router.push(`/cart/${itemId}`);
           } catch (error: any) {
-            toast.error(error.message || "Something went wrong");
+            toast.error(error.message || t("Product.Something went wrong"));
           }
         }}
       >
-        Add to Cart
+        {t("Product.Add to Cart")}
       </Button>
 
       <Button
@@ -86,15 +88,15 @@ export default function AddToCart({
         onClick={() => {
           try {
             addItem(item, quantity);
-            toast.success("Proceeding to checkout");
+            toast.success(t("Product.Proceeding to checkout"));
             router.push(`/checkout`);
           } catch (error: any) {
-            toast.error(error.message || "Something went wrong");
+            toast.error(error.message || t("Product.Something went wrong"));
           }
         }}
         className="w-full rounded-full cursor-pointer"
       >
-        Buy Now
+        {t("Product.Buy Now")}
       </Button>
     </div>
   );

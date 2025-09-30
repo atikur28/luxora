@@ -14,6 +14,7 @@ import {
 import Order from "./models/order.model";
 import Product from "./models/product.model";
 import Review from "./models/review.model";
+import Setting from "./models/setting.model";
 import User from "./models/user.model";
 import WebPage from "./models/web-page.model";
 
@@ -21,7 +22,7 @@ loadEnvConfig(cwd());
 
 const main = async () => {
   try {
-    const { products, users, reviews, webPages } = data;
+    const { products, users, reviews, webPages, settings } = data;
     await connectToDatabase(process.env.MONGODB_URI);
 
     await User.deleteMany();
@@ -56,6 +57,9 @@ const main = async () => {
     await WebPage.deleteMany();
     await WebPage.insertMany(webPages);
 
+    await Setting.deleteMany();
+    const createdSetting = await Setting.insertMany(settings);
+
     await Order.deleteMany();
     const orders = [];
     for (let i = 0; i < 200; i++) {
@@ -74,6 +78,7 @@ const main = async () => {
       createdProducts,
       createdReviews,
       createdOrders,
+      createdSetting,
       message: "Seeded database successfully",
     });
     process.exit(0);

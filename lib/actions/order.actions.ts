@@ -6,7 +6,7 @@ import { Cart, IOrderList, OrderItem, ShippingAddress } from "@/types";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { DateRange } from "react-day-picker";
-import { AVAILABLE_DELIVERY_DATES, PAGE_SIZE } from "../constants";
+import { PAGE_SIZE } from "../constants";
 import { connectToDatabase } from "../db";
 import Order, { IOrder } from "../db/models/order.model";
 import Product from "../db/models/product.model";
@@ -14,6 +14,7 @@ import User from "../db/models/user.model";
 import { paypal } from "../paypal";
 import { formatError, round2 } from "../utils";
 import { OrderInputSchema } from "../validator";
+import { getSetting } from "./setting.actions";
 
 // GET ORDERS
 export async function getOrderSummary(date: DateRange) {
@@ -357,10 +358,12 @@ export const calcDeliveryDateAndPrice = async ({
     items.reduce((acc, item) => acc + item.price * item.quantity, 0)
   );
 
+  const { availableDeliveryDates } = await getSetting();
+
   const deliveryDate =
-    AVAILABLE_DELIVERY_DATES[
+    availableDeliveryDates[
       deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
+        ? availableDeliveryDates.length - 1
         : deliveryDateIndex
     ];
 
@@ -378,11 +381,12 @@ export const calcDeliveryDateAndPrice = async ({
       (shippingPrice ? round2(shippingPrice) : 0) +
       (taxPrice ? round2(taxPrice) : 0)
   );
+
   return {
-    AVAILABLE_DELIVERY_DATES,
+    availableDeliveryDates,
     deliveryDateIndex:
       deliveryDateIndex === undefined
-        ? AVAILABLE_DELIVERY_DATES.length - 1
+        ? availableDeliveryDates.length - 1
         : deliveryDateIndex,
     itemsPrice,
     shippingPrice,
@@ -399,12 +403,17 @@ export async function getMyOrders({
   limit?: number;
   page: number;
 }) {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   await connectToDatabase();
   const session = await auth();
   if (!session) {
     throw new Error("User is not authenticated");
   }
+
   const skipAmount = (Number(page) - 1) * limit;
   const orders = await Order.find({
     user: session?.user?.id,
@@ -412,6 +421,7 @@ export async function getMyOrders({
     .sort({ createdAt: "desc" })
     .skip(skipAmount)
     .limit(limit);
+
   const ordersCount = await Order.countDocuments({ user: session?.user?.id });
 
   return {
@@ -437,7 +447,6 @@ export async function deleteOrder(id: string) {
 }
 
 // GET ALL ORDERS
-
 export async function getAllOrders({
   limit,
   page,
@@ -445,7 +454,11 @@ export async function getAllOrders({
   limit?: number;
   page: number;
 }) {
-  limit = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   await connectToDatabase();
   const skipAmount = (Number(page) - 1) * limit;
   const orders = await Order.find()
@@ -453,7 +466,9 @@ export async function getAllOrders({
     .sort({ createdAt: "desc" })
     .skip(skipAmount)
     .limit(limit);
+
   const ordersCount = await Order.countDocuments();
+
   return {
     data: JSON.parse(JSON.stringify(orders)) as IOrderList[],
     totalPages: Math.ceil(ordersCount / limit),

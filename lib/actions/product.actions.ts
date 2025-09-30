@@ -5,9 +5,9 @@ import Product, { IProduct } from "@/lib/db/models/product.model";
 import { IProductInput } from "@/types";
 import { revalidatePath } from "next/cache";
 import z from "zod";
-import { PAGE_SIZE } from "../constants";
 import { formatError } from "../utils";
 import { ProductInputSchema, ProductUpdateSchema } from "../validator";
+import { getSetting } from "./setting.actions";
 
 export async function getAllCategories() {
   await connectToDatabase();
@@ -72,7 +72,7 @@ export async function getProductBySlug(slug: string) {
 export async function getRelatedProductsByCategory({
   category,
   productId,
-  limit = PAGE_SIZE,
+  limit,
   page = 1,
 }: {
   category: string;
@@ -81,6 +81,12 @@ export async function getRelatedProductsByCategory({
   page: number;
 }) {
   await connectToDatabase();
+
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   const skipAmount = (Number(page) - 1) * limit;
   const conditions = {
     isPublished: true,
@@ -88,7 +94,7 @@ export async function getRelatedProductsByCategory({
     _id: { $ne: productId },
   };
   const products = await Product.find(conditions)
-    .sort({ numSales: "desc" })
+    .sort({ numSales: -1 })
     .skip(skipAmount)
     .limit(limit);
   const productsCount = await Product.countDocuments(conditions);
@@ -118,8 +124,12 @@ export async function getAllProducts({
   rating?: string;
   sort?: string;
 }) {
-  limit = limit || PAGE_SIZE;
   await connectToDatabase();
+
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
 
   const queryFilter =
     query && query !== "all"
@@ -141,7 +151,6 @@ export async function getAllProducts({
           },
         }
       : {};
-  // 10-50
   const priceFilter =
     price && price !== "all"
       ? {
@@ -161,14 +170,14 @@ export async function getAllProducts({
           : sort === "avg-customer-review"
             ? { avgRating: -1 }
             : { _id: -1 };
-  const isPublished = { isPublished: true };
+
   const products = await Product.find({
-    ...isPublished,
     ...queryFilter,
     ...tagFilter,
     ...categoryFilter,
     ...priceFilter,
     ...ratingFilter,
+    isPublished: true,
   })
     .sort(order)
     .skip(limit * (Number(page) - 1))
@@ -181,7 +190,9 @@ export async function getAllProducts({
     ...categoryFilter,
     ...priceFilter,
     ...ratingFilter,
+    isPublished: true,
   });
+
   return {
     products: JSON.parse(JSON.stringify(products)) as IProduct[],
     totalPages: Math.ceil(countProducts / limit),
@@ -239,7 +250,11 @@ export async function getAllProductsForAdmin({
 }) {
   await connectToDatabase();
 
-  const pageSize = limit || PAGE_SIZE;
+  const {
+    common: { pageSize },
+  } = await getSetting();
+  limit = limit || pageSize;
+
   const queryFilter =
     query && query !== "all"
       ? {
@@ -260,23 +275,25 @@ export async function getAllProductsForAdmin({
           : sort === "avg-customer-review"
             ? { avgRating: -1 }
             : { _id: -1 };
+
   const products = await Product.find({
     ...queryFilter,
   })
     .sort(order)
-    .skip(pageSize * (Number(page) - 1))
-    .limit(pageSize)
+    .skip(limit * (Number(page) - 1))
+    .limit(limit)
     .lean();
 
   const countProducts = await Product.countDocuments({
     ...queryFilter,
   });
+
   return {
     products: JSON.parse(JSON.stringify(products)) as IProduct[],
-    totalPages: Math.ceil(countProducts / pageSize),
+    totalPages: Math.ceil(countProducts / limit),
     totalProducts: countProducts,
-    from: pageSize * (Number(page) - 1) + 1,
-    to: pageSize * (Number(page) - 1) + products.length,
+    from: limit * (Number(page) - 1) + 1,
+    to: limit * (Number(page) - 1) + products.length,
   };
 }
 
