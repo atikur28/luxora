@@ -13,6 +13,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       role: string;
+      affiliateRequest: boolean;
     } & DefaultSession["user"];
   }
 }
@@ -57,6 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               name: user.name,
               email: user.email,
               role: user.role,
+              affiliateRequest: user.affiliateRequest,
             };
           }
         }
@@ -76,6 +78,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
         token.name = user.name || user.email!.split("@")[0];
         token.role = (user as { role: string }).role;
+        token.affiliateRequest =
+          (user as { affiliateRequest: boolean }).affiliateRequest || false;
       }
 
       if (session?.user?.name && trigger === "update") {
@@ -87,6 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.id = token.sub as string;
       session.user.role = token.role as string;
       session.user.name = token.name;
+      session.user.affiliateRequest = token.affiliateRequest as boolean;
       if (trigger === "update") {
         session.user.name = user.name;
       }

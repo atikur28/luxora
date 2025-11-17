@@ -9,6 +9,7 @@ const users: IUserInput[] = [
     email: "admin@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "Admin",
+    affiliateRequest: false,
     address: {
       fullName: "John Doe",
       street: "111 Main St",
@@ -26,6 +27,7 @@ const users: IUserInput[] = [
     email: "jane@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Jane Harris",
       street: "222 Main St",
@@ -43,6 +45,7 @@ const users: IUserInput[] = [
     email: "jack@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Jack Ryan",
       street: "333 Main St",
@@ -60,6 +63,7 @@ const users: IUserInput[] = [
     email: "sarah@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Sarah Smith",
       street: "444 Main St",
@@ -77,6 +81,7 @@ const users: IUserInput[] = [
     email: "michael@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "John Alexander",
       street: "555 Main St",
@@ -94,6 +99,7 @@ const users: IUserInput[] = [
     email: "emily@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Emily Johnson",
       street: "666 Main St",
@@ -111,6 +117,7 @@ const users: IUserInput[] = [
     email: "alice@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Alice Cooper",
       street: "777 Main St",
@@ -128,6 +135,7 @@ const users: IUserInput[] = [
     email: "tom@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Tom Hanks",
       street: "888 Main St",
@@ -145,6 +153,7 @@ const users: IUserInput[] = [
     email: "linda@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Linda Holmes",
       street: "999 Main St",
@@ -162,6 +171,7 @@ const users: IUserInput[] = [
     email: "george@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "George Smith",
       street: "101 First Ave",
@@ -179,6 +189,7 @@ const users: IUserInput[] = [
     email: "jessica@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Jessica Brown",
       street: "102 First Ave",
@@ -196,6 +207,7 @@ const users: IUserInput[] = [
     email: "chris@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Chris Evans",
       street: "103 First Ave",
@@ -213,6 +225,7 @@ const users: IUserInput[] = [
     email: "samantha@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Samantha Wilson",
       street: "104 First Ave",
@@ -230,6 +243,7 @@ const users: IUserInput[] = [
     email: "david@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "David Lee",
       street: "105 First Ave",
@@ -247,6 +261,7 @@ const users: IUserInput[] = [
     email: "anna@example.com",
     password: bcrypt.hashSync("123456", 5),
     role: "User",
+    affiliateRequest: false,
     address: {
       fullName: "Anna Smith",
       street: "106 First Ave",

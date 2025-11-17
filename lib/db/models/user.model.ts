@@ -15,6 +15,7 @@ const userSchema = new Schema<IUser>(
     password: { type: String },
     image: { type: String },
     emailVerified: { type: Boolean, default: false },
+    affiliateRequest: { type: Boolean, default: false },
   },
   {
     timestamps: true,

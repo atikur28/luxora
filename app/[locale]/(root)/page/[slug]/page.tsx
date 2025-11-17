@@ -1,4 +1,5 @@
 import { getWebPageBySlug } from "@/lib/actions/web-page.actions";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 
@@ -34,6 +35,15 @@ export default async function ProductDetailsPage(props: {
       <section className="text-justify text-lg mb-20 web-page-content">
         <ReactMarkdown>{webPage.content}</ReactMarkdown>
       </section>
+
+      <div className="mt-6 flex justify-center">
+        <Link
+          href="/account"
+          className="inline-block bg-[#5A3DF0] text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-[#4A2DD8] transition-all"
+        >
+          Create Your Account & Become an Affiliate
+        </Link>
+      </div>
     </div>
   );
 }

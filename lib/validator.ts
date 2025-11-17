@@ -168,6 +168,7 @@ export const UserInputSchema = z.object({
   emailVerified: z.boolean(),
   role: UserRole,
   password: Password,
+  affiliateRequest: z.boolean(),
   paymentMethod: z.string().min(1, "Payment method is required"),
   address: z.object({
     fullName: z.string().min(1, "Full name is required"),

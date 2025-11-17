@@ -64,8 +64,33 @@ export async function updateUserName(user: IUserName) {
   }
 }
 
-// DELETE
+// ACCEPT AFFILIATE
+export async function acceptAffiliateRequest(id: string) {
+  try {
+    await connectToDatabase();
 
+    const user = await User.findById(id);
+    if (!user) throw new Error("User not found");
+
+    user.role = "Affiliater";
+
+    await user.save();
+
+    revalidatePath("/admin/affiliate-request");
+
+    return {
+      success: true,
+      message: "User has been updated to Affiliater",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+// DELETE
 export async function deleteUser(id: string) {
   try {
     await connectToDatabase();

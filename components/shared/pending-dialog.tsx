@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -14,12 +15,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-export default function DeleteDialog({
-  id,
+export default function AcceptDialog({
+  userId,
   action,
   callbackAction,
 }: {
-  id: string;
+  userId: string;
   action: (id: string) => Promise<{ success: boolean; message: string }>;
   callbackAction?: () => void;
 }) {
@@ -30,29 +31,32 @@ export default function DeleteDialog({
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button size="sm" variant="outline" className="cursor-pointer">
-          Delete
+          Pending
         </Button>
       </AlertDialogTrigger>
+
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>Accept Affiliate Request?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone.
+            Once accepted, this user will become an Affiliater. This action
+            cannot be reverted.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
+
+        <AlertDialogFooter className="justify-between">
           <AlertDialogCancel className="cursor-pointer">
             Cancel
           </AlertDialogCancel>
 
           <Button
-            variant="destructive"
             size="sm"
+            variant="default"
             className="cursor-pointer"
             disabled={isPending}
             onClick={() =>
               startTransition(async () => {
-                const res = await action(id);
+                const res = await action(userId);
                 if (!res.success) {
                   toast.error(res.message);
                 } else {
@@ -63,7 +67,7 @@ export default function DeleteDialog({
               })
             }
           >
-            {isPending ? "Deleting..." : "Delete"}
+            {isPending ? "Accepting..." : "Accept"}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
