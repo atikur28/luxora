@@ -60,7 +60,7 @@ export default async function UserButton() {
                 </Link>
               )}
               {session.user.role === "Affiliater" && (
-                <Link className="w-full" href="/affiliate/overview">
+                <Link className="w-full" href="/affiliate-marketer/overview">
                   <DropdownMenuItem>Affiliater</DropdownMenuItem>
                 </Link>
               )}
