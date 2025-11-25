@@ -24,21 +24,6 @@ const sortOrders = [
   { value: "best-selling", name: "Best selling" },
 ];
 
-const prices = [
-  {
-    name: "$1 to $20",
-    value: "1-20",
-  },
-  {
-    name: "$21 to $50",
-    value: "21-50",
-  },
-  {
-    name: "$51 to $1000",
-    value: "51-1000",
-  },
-];
-
 export async function generateMetadata(props: {
   searchParams: Promise<{
     q: string;
@@ -185,29 +170,6 @@ export default async function SearchPage(props: {
                       href={getFilterUrl({ category: c, params })}
                     >
                       {c}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <div className="font-bold">{t("Search.Price")}</div>
-              <ul>
-                <li>
-                  <Link
-                    className={`${"all" === price && "text-primary"}`}
-                    href={getFilterUrl({ price: "all", params })}
-                  >
-                    {t("Search.All")}
-                  </Link>
-                </li>
-                {prices.map((p) => (
-                  <li key={p.value}>
-                    <Link
-                      href={getFilterUrl({ price: p.value, params })}
-                      className={`${p.value === price && "text-primary"}`}
-                    >
-                      {p.name}
                     </Link>
                   </li>
                 ))}
