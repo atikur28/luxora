@@ -1,0 +1,29 @@
+# Systemd service unit for LuxOra e-commerce app
+# Location: /etc/systemd/system/final-year-project.service
+
+[Unit]
+Description=LuxOra E-Commerce Application
+Documentation=https://github.com/NishadApi25/final-year-project
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/var/www/final-year-project
+EnvironmentFile=/var/www/final-year-project/.env.local
+ExecStart=/usr/bin/npm run start
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/final-year-project/out.log
+StandardError=append:/var/log/final-year-project/err.log
+SyslogIdentifier=final-year-project
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/final-year-project /var/log/final-year-project
+
+[Install]
+WantedBy=multi-user.target

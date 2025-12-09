@@ -39,6 +39,10 @@ const productSchema = new Schema<IProduct>(
       type: Number,
       required: true,
     },
+    commission: {
+      type: Number,
+      default: 0,
+    },
     countInStock: {
       type: Number,
       required: true,

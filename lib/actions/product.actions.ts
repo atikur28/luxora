@@ -64,7 +64,7 @@ export async function getProductsByTag({
 export async function getProductBySlug(slug: string) {
   await connectToDatabase();
   const product = await Product.findOne({ slug, isPublished: true });
-  if (!product) throw new Error("Product not found");
+  if (!product) return null;
   return JSON.parse(JSON.stringify(product)) as IProduct;
 }
 

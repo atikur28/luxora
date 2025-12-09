@@ -7,7 +7,7 @@ import { getMessages } from "next-intl/server";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
-import { ReactNode } from "react";
+import { auth } from "@/auth";
 import "../globals.css";
 
 // Fonts
@@ -36,16 +36,13 @@ export async function generateMetadata() {
 }
 
 type AppLayoutProps = {
-  params: { locale: string } | Promise<{ locale: string }>;
+  params: Promise<{ locale: string }>;
   children: React.ReactNode;
 };
 
-export default async function AppLayout({
-  params,
-  children,
-}: AppLayoutProps): Promise<ReactNode> {
+export default async function AppLayout({ params, children }: AppLayoutProps) {
   const resolvedParams = await params;
-  const { locale } = resolvedParams;
+  const { locale } = resolvedParams as { locale: string };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!routing.locales.includes(locale as any)) {
@@ -56,6 +53,7 @@ export default async function AppLayout({
 
   const currencyCookie = (await cookies()).get("currency");
   const currency = currencyCookie ? currencyCookie.value : "USD";
+  const session = await auth();
 
   return (
     <html
@@ -64,10 +62,11 @@ export default async function AppLayout({
       suppressHydrationWarning
     >
       <body
+        suppressHydrationWarning
         className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <ClientProviders setting={{ ...setting, currency }}>
+          <ClientProviders setting={{ ...setting, currency }} session={session}>
             {children}
           </ClientProviders>
         </NextIntlClientProvider>

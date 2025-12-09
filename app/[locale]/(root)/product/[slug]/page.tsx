@@ -1,22 +1,23 @@
+
 import { auth } from "@/auth";
+import { getProductBySlug, getRelatedProductsByCategory } from "@/lib/actions/product.actions";
+import { notFound } from "next/navigation";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  getProductBySlug,
-  getRelatedProductsByCategory,
-} from "@/lib/actions/product.actions";
-
-import BrowsingHistoryList from "@/components/shared/browsing-history-list";
-import AddToBrowsingHistory from "@/components/shared/product/add-to-browsing-history";
 import ProductGallery from "@/components/shared/product/product-gallery";
 import ProductPrice from "@/components/shared/product/product-price";
 import ProductSlider from "@/components/shared/product/product-slider";
 import RatingSummary from "@/components/shared/product/rating-summary";
 import SelectVariant from "@/components/shared/product/select-variant";
+import AddToBrowsingHistory from "@/components/shared/product/add-to-browsing-history";
+import BrowsingHistoryList from "@/components/shared/browsing-history-list";
 import { Separator } from "@/components/ui/separator";
 import { generateId, round2 } from "@/lib/utils";
 import { getTranslations } from "next-intl/server";
 import ReviewList from "./review-list";
+import GenerateAffiliateButton from "@/components/shared/product/generate-affiliate-button";
+import ProductPageClient from "./product-page-client";
+import AffiliateParamStorer from "@/components/shared/product/affiliate-param-storer";
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
@@ -38,17 +39,14 @@ export default async function ProductDetails(props: {
   searchParams: Promise<{ page: string; color: string; size: string }>;
 }) {
   const searchParams = await props.searchParams;
-
   const { page, color, size } = searchParams;
-
   const params = await props.params;
-
   const { slug } = params;
 
   const session = await auth();
 
   const product = await getProductBySlug(slug);
-
+  if (!product) return notFound();
   const relatedProducts = await getRelatedProductsByCategory({
     category: product.category,
     productId: product._id,
@@ -56,18 +54,23 @@ export default async function ProductDetails(props: {
   });
 
   const t = await getTranslations();
+
+  // Use a client component to generate and show affiliate link popup
+
   return (
     <div>
+      <AffiliateParamStorer />
+      <ProductPageClient productId={String(product._id)} />
       <AddToBrowsingHistory id={product._id} category={product.category} />
       <section>
-        <div className="grid grid-cols-1 md:grid-cols-5  ">
+        <div className="grid grid-cols-1 md:grid-cols-5">
           <div className="col-span-2">
             <ProductGallery images={product.images} />
           </div>
 
           <div className="flex w-full flex-col gap-2 md:p-5 col-span-2">
             <div className="flex flex-col gap-3">
-              <p className="p-medium-16 rounded-full bg-grey-500/10   text-grey-500">
+              <p className="p-medium-16 rounded-full bg-grey-500/10 text-grey-500">
                 {t("Product.Brand")} {product.brand} {product.category}
               </p>
               <h1 className="font-bold text-lg lg:text-xl">{product.name}</h1>
@@ -99,17 +102,13 @@ export default async function ProductDetails(props: {
             </div>
             <Separator className="my-2" />
             <div className="flex flex-col gap-2">
-              <p className="p-bold-20 text-grey-600">
-                {t("Product.Description")}:
-              </p>
-              <p className="p-medium-16 lg:p-regular-18">
-                {product.description}
-              </p>
+              <p className="p-bold-20 text-grey-600">{t("Product.Description")}:</p>
+              <p className="p-medium-16 lg:p-regular-18">{product.description}</p>
             </div>
           </div>
           <div>
             <Card>
-              <CardContent className="p-4 flex flex-col  gap-4">
+              <CardContent className="p-4 flex flex-col gap-4">
                 <ProductPrice price={product.price} />
 
                 {product.countInStock > 0 && product.countInStock <= 3 && (
@@ -120,13 +119,9 @@ export default async function ProductDetails(props: {
                   </div>
                 )}
                 {product.countInStock !== 0 ? (
-                  <div className="text-green-700 text-xl">
-                    {t("Product.In Stock")}
-                  </div>
+                  <div className="text-green-700 text-xl">{t("Product.In Stock")}</div>
                 ) : (
-                  <div className="text-destructive text-xl">
-                    {t("Product.Out of Stock")}
-                  </div>
+                  <div className="text-destructive text-xl">{t("Product.Out of Stock")}</div>
                 )}
 
                 {product.countInStock !== 0 && (
@@ -148,23 +143,30 @@ export default async function ProductDetails(props: {
                     />
                   </div>
                 )}
+                
+                {/* Affiliate Button with Yellow Border */}
+                <GenerateAffiliateButton productId={product._id} className="mt-4" />
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
+
+      {/* Customer Reviews */}
       <section className="mt-10">
-        <h2 className="h2-bold mb-2" id="reviews">
-          {t("Product.Customer Reviews")}
-        </h2>
+        <h2 className="h2-bold mb-2" id="reviews">{t("Product.Customer Reviews")}</h2>
         <ReviewList product={product} userId={session?.user.id} />
       </section>
+
+      {/* Related Products */}
       <section className="mt-10">
         <ProductSlider
           products={relatedProducts.data}
           title={t("Product.Best Sellers in", { name: product.category })}
         />
       </section>
+
+      {/* Browsing History */}
       <section>
         <BrowsingHistoryList className="mt-10" />
       </section>

@@ -8,8 +8,10 @@ export const metadata: Metadata = {
 
 const DashboardPage = async () => {
   const session = await auth();
-  if (session?.user.role !== "Affiliater")
+
+  if (!session?.user || session.user.role !== "Affiliater") {
     throw new Error("Affiliater permission required");
+  }
 
   return <OverviewReport />;
 };

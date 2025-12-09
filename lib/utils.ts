@@ -61,28 +61,49 @@ export const round2 = (num: number) =>
 export const generateId = () =>
   Array.from({ length: 24 }, () => Math.floor(Math.random() * 10)).join("");
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const formatError = (error: any): string => {
-  if (error.name === "ZodError") {
-    const fieldErrors = Object.keys(error.errors).map((field) => {
-      const errorMessage = error.errors[field].message;
-      return `${error.errors[field].path}: ${errorMessage}`; // field: errorMessage
-    });
-    return fieldErrors.join(". ");
-  } else if (error.name === "ValidationError") {
-    const fieldErrors = Object.keys(error.errors).map((field) => {
-      const errorMessage = error.errors[field].message;
+export const formatError = (error: unknown): string => {
+  // ZodError (zod v3/v4 differences)
+  if (typeof error === "object" && error !== null && "name" in error && error.name === "ZodError") {
+    // v4 exposes issues array
+    if ("issues" in error && Array.isArray(error.issues)) {
+      const messages = error.issues.map((issue: { path?: (string | number)[]; message: string }) => {
+        const path = Array.isArray(issue.path) ? issue.path.join(".") : issue.path;
+        return path ? `${path}: ${issue.message}` : issue.message;
+      });
+      return messages.join(". ");
+    }
+
+    // Fallback for older shape
+    if ("errors" in error && typeof error.errors === "object" && error.errors !== null) {
+      const fieldErrors = Object.keys(error.errors as Record<string, unknown>).map((field) => {
+        const err = (error.errors as Record<string, unknown>)[field] as { message?: string; path?: string };
+        const errorMessage = err?.message ?? JSON.stringify(err);
+        const path = err?.path ?? field;
+        return `${path}: ${errorMessage}`;
+      });
+      return fieldErrors.join(". ");
+    }
+
+    // Last-resort stringification
+    if ("message" in error && typeof error.message === "string") {
+      return error.message;
+    }
+    return JSON.stringify(error);
+  } else if (typeof error === "object" && error !== null && "name" in error && error.name === "ValidationError") {
+    const errorObj = error as { errors?: Record<string, { message?: string }> };
+    const fieldErrors = Object.keys(errorObj.errors || {}).map((field) => {
+      const errorMessage = errorObj.errors?.[field]?.message ?? JSON.stringify(errorObj.errors?.[field]);
       return errorMessage;
     });
     return fieldErrors.join(". ");
-  } else if (error.code === 11000) {
-    const duplicateField = Object.keys(error.keyValue)[0];
+  } else if (typeof error === "object" && error !== null && "code" in error && error.code === 11000) {
+    const errorObj = error as { keyValue?: Record<string, unknown> };
+    const duplicateField = Object.keys(errorObj.keyValue || {})[0];
     return `${duplicateField} already exists`;
+  } else if (typeof error === "object" && error !== null && "message" in error && typeof error.message === "string") {
+    return error.message;
   } else {
-    // return 'Something went wrong. please try again'
-    return typeof error.message === "string"
-      ? error.message
-      : JSON.stringify(error.message);
+    return JSON.stringify(error);
   }
 };
 

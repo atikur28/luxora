@@ -102,6 +102,11 @@
     "Rating": "Rating",
     "No reviews yet": "No reviews yet",
     "Submitting": "Submitting..."
+    ,
+    "Product not found": "Product not found"
+    ,
+    "Proceeding to checkout": "Proceeding to checkout",
+    "Something went wrong": "Something went wrong"
   },
   "Cart": {
     "Shopping Cart": "Shopping Cart",
@@ -224,6 +229,21 @@
     "Affiliater": "Affiliater",
     "Settings": "Settings",
     "Dashboard": "Dashboard",
+    "Loading": "Loading",
+    "Account Info": "Account Info",
+    "Name": "Name",
+    "Email": "Email",
+    "Role": "Role",
+    "Affiliate Approved": "Affiliate Approved",
+    "Affiliate Dashboard": "Affiliate Dashboard",
+    "Yes": "Yes",
+    "Pending": "Pending",
+    "Clicks Analytics": "Clicks Analytics",
+    "Browsing History": "Browsing History",
+    "Related Products": "Related Products",
+    "Total Earnings": "Total Earnings",
+    "Clicks": "Clicks",
+    "Conversions": "Conversions",
     "Total Revenue": "Total Revenue",
     "View revenue": "View revenue",
     "Sales": "Sales",

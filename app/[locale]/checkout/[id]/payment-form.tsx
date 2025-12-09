@@ -21,6 +21,7 @@ import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import CheckoutFooter from "../checkout-footer";
 import StripeForm from "./stripe-form";
+import BkashForm from "./bkash-form";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string
@@ -137,6 +138,14 @@ export default function OrderDetailsForm({
                   orderId={order._id}
                 />
               </Elements>
+            )}
+
+            {!isPaid && paymentMethod && paymentMethod.toLowerCase() === "bkash" && (
+              <BkashForm
+                orderId={order._id}
+                totalPrice={order.totalPrice}
+                currency={"USD"}
+              />
             )}
 
             {!isPaid && paymentMethod === "Cash On Delivery" && (

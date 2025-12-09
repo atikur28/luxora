@@ -1332,6 +1332,7 @@ We also provide helpful resources such as order tracking, product guides, and FA
         { name: "PayPal", commission: 0 },
         { name: "Stripe", commission: 0 },
         { name: "Cash On Delivery", commission: 0 },
+        { name: "Bkash", commission: 0 },
       ],
       defaultPaymentMethod: "PayPal",
       availableDeliveryDates: [

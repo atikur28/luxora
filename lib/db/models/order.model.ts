@@ -39,12 +39,14 @@ const orderSchema = new Schema<IOrder>(
       city: { type: String, required: true },
       postalCode: { type: String, required: true },
       country: { type: String, required: true },
-      province: { type: String, required: true },
+      // province is optional because many countries do not use provinces/states
+      province: { type: String },
       phone: { type: String, required: true },
     },
     expectedDeliveryDate: { type: Date, required: true },
     paymentMethod: { type: String, required: true },
     paymentResult: { id: String, status: String, email_address: String },
+    affiliateUserId: { type: String }, // Optional: affiliate user ID if order came through affiliate link
     itemsPrice: { type: Number, required: true },
     shippingPrice: { type: Number, required: true },
     taxPrice: { type: Number, required: true },

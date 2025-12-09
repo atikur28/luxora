@@ -47,6 +47,7 @@ const productDefaultValues: IProductInput =
         colors: [],
         ratingDistribution: [],
         reviews: [],
+        commission: 0,
       }
     : {
         name: "",
@@ -67,6 +68,7 @@ const productDefaultValues: IProductInput =
         colors: [],
         ratingDistribution: [],
         reviews: [],
+        commission: 0,
       };
 
 const ProductForm = ({
@@ -85,7 +87,9 @@ const ProductForm = ({
       type === "Update" ? ProductUpdateSchema : ProductInputSchema
     ) as Resolver<IProductInput>,
     defaultValues:
-      product && type === "Update" ? product : productDefaultValues,
+      product && type === "Update"
+        ? ({ ...productDefaultValues, ...product } as IProductInput)
+        : productDefaultValues,
   });
 
   async function onSubmit(values: IProductInput) {
@@ -238,6 +242,27 @@ const ProductForm = ({
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="commission"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Commission (%)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter commission percentage"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Commission percentage for affiliates (0-100%).
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

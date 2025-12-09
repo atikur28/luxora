@@ -4,7 +4,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import ProductPrice from "@/components/shared/product/product-price";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,15 @@ export default function StripeForm({
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
   const [email, setEmail] = useState<string>();
+  const [affiliateUserId, setAffiliateUserId] = useState<string | null>(null);
+
+  // Get affiliate parameter from localStorage
+  useEffect(() => {
+    const storedAffiliateUserId = localStorage.getItem("affiliateUserId");
+    if (storedAffiliateUserId) {
+      setAffiliateUserId(storedAffiliateUserId);
+    }
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -33,11 +42,17 @@ export default function StripeForm({
     if (stripe == null || elements == null || email == null) return;
 
     setIsLoading(true);
+    
+    let returnUrl = `${site.url}/checkout/${orderId}/stripe-payment-success`;
+    if (affiliateUserId) {
+      returnUrl += `?affiliate=${affiliateUserId}`;
+    }
+
     stripe
       .confirmPayment({
         elements,
         confirmParams: {
-          return_url: `${site.url}/checkout/${orderId}/stripe-payment-success`,
+          return_url: returnUrl,
         },
       })
       .then(({ error }) => {

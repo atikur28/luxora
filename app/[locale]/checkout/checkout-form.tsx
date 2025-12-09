@@ -36,33 +36,37 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm, useWatch } from "react-hook-form";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import CheckoutFooter from "./checkout-footer";
 
-const shippingAddressDefaultValues =
-  process.env.NODE_ENV === "development"
-    ? {
-        fullName: "Basir",
-        street: "1911, 65 Sherbrooke Est",
-        city: "Montreal",
-        province: "Quebec",
-        phone: "4181234567",
-        postalCode: "H2X 1C4",
-        country: "Canada",
-      }
-    : {
-        fullName: "",
-        street: "",
-        city: "",
-        province: "",
-        phone: "",
-        postalCode: "",
-        country: "",
-      };
+// Countries that have provinces/states
+const COUNTRIES_WITH_PROVINCES = [
+  "Canada",
+  "United States",
+  "Australia",
+  "Mexico",
+  "Germany",
+  "India",
+  "Nigeria",
+  "Argentina",
+  "Brazil",
+];
+
+const shippingAddressDefaultValues = {
+  fullName: "",
+  street: "",
+  city: "",
+  province: "",
+  phone: "",
+  postalCode: "",
+  country: "",
+};
 
 const CheckoutForm = () => {
   const router = useRouter();
+  const { data: session } = useSession();
   const {
     setting: {
       site,
@@ -96,6 +100,20 @@ const CheckoutForm = () => {
     resolver: zodResolver(ShippingAddressSchema),
     defaultValues: shippingAddress || shippingAddressDefaultValues,
   });
+
+  // Watch the country field to conditionally show/hide province
+  const selectedCountry = useWatch({
+    control: shippingAddressForm.control,
+    name: "country",
+  });
+
+  // Clear province if country doesn't have provinces
+  useEffect(() => {
+    if (selectedCountry && !COUNTRIES_WITH_PROVINCES.includes(selectedCountry)) {
+      shippingAddressForm.setValue("province", "");
+    }
+  }, [selectedCountry, shippingAddressForm]);
+
   const onSubmitShippingAddress: SubmitHandler<ShippingAddress> = (values) => {
     setShippingAddress(values);
     setIsAddressSelected(true);
@@ -112,6 +130,61 @@ const CheckoutForm = () => {
     shippingAddressForm.setValue("phone", shippingAddress.phone);
   }, [items, isMounted, router, shippingAddress, shippingAddressForm]);
 
+  // Auto-fill fullName from user session if not already set
+  useEffect(() => {
+    if (isMounted && session?.user?.name && !shippingAddress?.fullName) {
+      shippingAddressForm.setValue("fullName", session.user.name);
+    }
+  }, [isMounted, session, shippingAddress, shippingAddressForm]);
+
+  // Clear saved address when user logs in/out to prevent showing wrong user's data
+  useEffect(() => {
+    if (isMounted && session?.user?.email) {
+      // Check if there's a saved email in cart - if not, this is a new user, so clear address
+      // This prevents showing previous user's address to current user
+      const cartEmail = localStorage.getItem("cartUserEmail");
+      if (cartEmail !== session.user.email) {
+        localStorage.setItem("cartUserEmail", session.user.email);
+        // Clear the cart's shipping address so blank form shows
+        if (shippingAddress?.fullName === "Basir" || !shippingAddress?.fullName) {
+          // Reset form and update cart store so persisted cart doesn't keep previous user's address
+          shippingAddressForm.reset(shippingAddressDefaultValues);
+          shippingAddressForm.setValue("fullName", session.user.name || "");
+          try {
+            // Update cart store shipping address to empty values for the new user
+            setShippingAddress(shippingAddressDefaultValues as unknown as ShippingAddress);
+          } catch (err) {
+            // swallow errors - this is a best-effort cleanup
+            console.warn("Failed to clear persisted cart shipping address", err);
+          }
+        }
+      } else {
+        // If cartUserEmail matches but data still shows previous user, inspect persisted cart-store and clear if needed
+        try {
+          const raw = localStorage.getItem("cart-store");
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            const persistedAddress = parsed?.state?.cart?.shippingAddress || parsed?.cart?.shippingAddress;
+            if (persistedAddress && persistedAddress.fullName && parsed) {
+              // If persisted fullName does not match session user, clear it
+              if (persistedAddress.fullName !== session.user.name) {
+                shippingAddressForm.reset(shippingAddressDefaultValues);
+                shippingAddressForm.setValue("fullName", session.user.name || "");
+                try {
+                  setShippingAddress(shippingAddressDefaultValues as unknown as ShippingAddress);
+                } catch (err) {
+                  console.warn("Failed to clear persisted cart shipping address", err);
+                }
+              }
+            }
+          }
+        } catch {
+          // ignore JSON parse errors
+        }
+      }
+    }
+  }, [isMounted, session, shippingAddress, shippingAddressForm, setShippingAddress]);
+
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false);
   const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
     useState<boolean>(false);
@@ -119,6 +192,11 @@ const CheckoutForm = () => {
     useState<boolean>(false);
 
   const handlePlaceOrder = async () => {
+    // Get affiliateUserId from localStorage if available
+    const affiliateUserId = typeof window !== "undefined" 
+      ? localStorage.getItem("affiliateUserId") || undefined 
+      : undefined;
+
     const res = await createOrder({
       items,
       shippingAddress,
@@ -131,7 +209,7 @@ const CheckoutForm = () => {
       shippingPrice,
       taxPrice,
       totalPrice,
-    });
+    }, affiliateUserId || undefined);
     if (!res.success) {
       toast.error(res.message);
     } else {
@@ -143,6 +221,10 @@ const CheckoutForm = () => {
   const handleSelectPaymentMethod = () => {
     setIsAddressSelected(true);
     setIsPaymentMethodSelected(true);
+    // Set default delivery date index if not already set
+    if (deliveryDateIndex === undefined) {
+      setDeliveryDateIndex(0);
+    }
   };
   const handleSelectShippingAddress = () => {
     shippingAddressForm.handleSubmit(onSubmitShippingAddress)();
@@ -338,22 +420,24 @@ const CheckoutForm = () => {
                               </FormItem>
                             )}
                           />
-                          <FormField
-                            control={shippingAddressForm.control}
-                            name="province"
-                            render={({ field }) => (
-                              <FormItem className="w-full">
-                                <FormLabel>Province</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder="Enter province"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          {COUNTRIES_WITH_PROVINCES.includes(selectedCountry || "") && (
+                            <FormField
+                              control={shippingAddressForm.control}
+                              name="province"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <FormLabel>Province / State</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Enter province or state"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          )}
                           <FormField
                             control={shippingAddressForm.control}
                             name="country"
