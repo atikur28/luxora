@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LuxOra | Elevate Your Shopping Experience
 
-## Getting Started
+**Live Link**: https://luxora-kappa.vercel.app
 
-First, run the development server:
+LuxOra is a modern, high-performance, and secure e-commerce platform built to deliver a seamless and premium online shopping experience. Developed with **Next.js** and **TypeScript**, LuxOra focuses on speed, scalability, security, and user-centric design. With advanced features like multi-language support, theme customization, and secure payment gateways, LuxOra redefines luxury e-commerce for the modern web.
+
+---
+
+## ✨ Features
+
+### 🏠 Home Page
+- Elegant and responsive Navbar
+- Featured & trending products showcase
+- Category-based product discovery
+- Promotional banners and highlights
+- Smooth animations and modern UI
+
+---
+
+### 🛍️ Product Browsing
+- Fast product listing with optimized loading
+- Detailed product pages with images, pricing, and descriptions
+- Saved browsing history for better user experience
+- Safe browsing protection
+
+---
+
+### 🔍 Search & Filtering
+- Smart product search
+- Category-based filtering
+- Price and relevance-based sorting
+
+---
+
+### 🛒 Cart & Checkout
+- Add to cart with real-time updates
+- Smooth and distraction-free checkout flow
+- Secure order summary and confirmation
+- Responsive checkout for all devices
+
+---
+
+### 💳 Payment System
+- Stripe integration
+- PayPal support
+- Cash on Delivery option
+- Fully encrypted and secure transactions
+
+---
+
+### 🌍 Personalization
+- Multi-language support
+- Multi-theme (Light/Dark/Custom) support
+- Personalized shopping experience per user
+
+---
+
+### 👤 User Authentication
+- Secure login and registration
+- Google authentication support
+- User profile management
+- Order history and account overview
+
+---
+
+### 📱 Responsive Design
+- Fully responsive across Mobile, Tablet, and Desktop
+- Optimized UI for all screen sizes
+
+---
+
+### 🚀 Performance & Security
+- High-speed optimized performance
+- Server-side rendering for SEO and speed
+- Secure API handling
+- Scalable architecture for future growth
+
+---
+
+## 🌟 Unique Highlights
+
+- **Luxury-Focused UI/UX**: Clean, premium, and modern design
+- **Future-Ready Architecture**: Built for scalability and performance
+- **Advanced Security**: Encrypted payments and safe browsing
+- **Personalized Shopping**: Language & theme customization
+- **Smooth User Journey**: From browsing to checkout, everything feels effortless
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js**
+- **TypeScript**
+- **Tailwind CSS**
+- **Shadcn UI**
+
+### Backend
+- **MongoDB**
+- **Mongoose**
+
+### Payment & Auth
+- **Stripe**
+- **PayPal**
+- **Google Authentication**
+
+---
+
+## 📦 Installation & Setup
 
 ```bash
+git clone https://github.com/atikur28/luxora.git
+cd luxora
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
